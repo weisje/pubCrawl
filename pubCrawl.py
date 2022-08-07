@@ -32,7 +32,15 @@ def fileNamer():
 
 #!STUB(Incomplete): Function for accepting & parsing user input from the console line.  Expected input is from the sys.argv format that comes from the console.  
 def userInputHandler(systemInput):
-	pass
+	defaultURL = "http://scanme.nmap.org/"
+	print(len(sys.argv))
+	if(len(systemInput) <= 1):
+		providedURL = defaultURL
+	else:
+		providedURL = sys.argv[1]
+
+	return(providedURL)
+
 #!STUB(Incomplete): Function for attempting to clean up user's input & parsing it properly for future connection/handling.
 def userInputParser(providedURL):
 	pass
@@ -51,7 +59,9 @@ def dataParser():
 
 #!STUB(Incomplete): main function: Function for the primary orchestration & running of the code
 def main():
-	pass
+	workingURL = (userInputHandler(sys.argv))
+	print(workingURL)
+	print(type(workingURL))
 
 #***INCOMPLETE BLOCK BEGIN***
 #**STUB BLOCK END**
