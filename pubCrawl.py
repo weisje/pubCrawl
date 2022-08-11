@@ -11,6 +11,7 @@ import requests
 import re
 import string
 import sys
+import datetime
 
 #*IMPORT BLOCK END*
 
@@ -20,7 +21,10 @@ import sys
 
 #!STUB(Version 2.0 Feature): Function for attempting to clean up user's input & parsing it properly for future connection/handling.
 def userInputParser(providedURL):
-	return providedURL
+	try:
+		return providedURL
+	except Exception as e:
+		logHandler(e, 'userInputParser', 'ERROR')
 
 #STUB(Version 2.0 Feature): Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
 def recursiveDepthManager(intDepth = 1):
@@ -34,41 +38,63 @@ def siteRepCheck():
 #***FUTURE VERSION BLOCK END***
 #***INCOMPLETE BLOCK BEGIN***
 
-#!STUB(Incomplete): Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
-def siteScraper(providedHTML):
-	urlList = []
-	for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
-		print("\'href\': " + link.get('href'))
-		urlList.append("%s" % link.get('href'))
-	return(urlList)
-
-#!STUB(Incomplete): Function for parsing the data that is found from the siteScraper & saving it to a txt file.
-def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
-	fileName = providedFileName + fileType
-	fileLocation = "./output/"
-	fullFilePath = fileLocation + fileName
-	with open(fullFilePath, mode) as fileWriter:
-		for link in providedData:
-			fileWriter.write('%s\n' % link)
-	fileWriter.close()
+#!STUB(Being Tested): Function for gathering error information & recording it to a central location.
+def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
+	logTime = datetime.datetime.now()
+	fileName = logType + '_LOGS' + '.txt'
+	fullFilePath = "./output/logs/" + fileName
+	openMode = 'a+'
+	writeFile = open(fullFilePath, openMode)
+	writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
+	writeFile.close()
+	sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
 
 #***INCOMPLETE BLOCK BEGIN***
 #**STUB BLOCK END**
 
+#Function for parsing the data that is found from the siteScraper & saving it to a txt file.
+def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
+	try:
+		fileName = providedFileName + fileType
+		fileLocation = "./output/"
+		fullFilePath = fileLocation + fileName
+		with open(fullFilePath, mode) as fileWriter:
+			for link in providedData:
+				fileWriter.write('%s\n' % link)
+		fileWriter.close()
+	except Exception as e:
+		logHandler(e, 'dataParser', 'ERROR')
+#Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
+def siteScraper(providedHTML):
+	urlList = []
+	try:
+		for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
+			print("\'href\': " + link.get('href'))
+			urlList.append("%s" % link.get('href'))
+		return(urlList)
+	except Exception as e:
+		logHandler(e, 'siteScraper', 'ERROR')
+
 #Function for negotiating & connecting to user supplied URL.
 def siteConnector(workingURL):
-	response = requests.get(workingURL)
-	return(response.text)
+	try:
+		response = requests.get(workingURL)
+		return(response.text)
+	except Exception as e:
+		logHandler(e, 'siteConnector', 'ERROR')
 
 #Function for accepting & parsing user input from the console line.  Expected input is from the sys.argv format that comes from the console.  
 def userInputHandler(systemInput):
 	defaultURL = "http://scanme.nmap.org/"
-	if(len(systemInput) <= 1):
-		cleanedURL = defaultURL
-	else:
-		providedURL = sys.argv[1]
-		cleanedURL = userInputParser(providedURL)
-	return(cleanedURL)
+	try:
+		if(len(systemInput) <= 1):
+			cleanedURL = defaultURL
+		else:
+			providedURL = sys.argv[1]
+			cleanedURL = userInputParser(providedURL)
+		return(cleanedURL)
+	except Exception as e:
+		logHandler(e, 'userInputHandler', 'ERROR')
 
 #Feature for generating a unique filename for each of the pubCrawl outputs.
 def fileNamer():
@@ -103,17 +129,18 @@ def fileNamer():
 "MundaneObjects":["chain","ink","case","door"],
 "Nouns":["warning", "presence", "weapon", "player"]
 }
-
-	adjectiveKey = random.choice(list(adjectives))
-	adjectivePool = adjectives[adjectiveKey]
-	adjectiveSelection = random.choice(list(adjectivePool)).capitalize()
-	nounKey = random.choice(list(nouns))
-	nounPool = nouns[nounKey]
-	nounSelection = random.choice(list(nounPool)).capitalize()
-	randomDigits = ''.join(random.choice(string.digits) for _ in range(4))
-	fileName = adjectiveSelection + nounSelection + randomDigits
-
-	return(fileName)
+	try:
+		adjectiveKey = random.choice(list(adjectives))
+		adjectivePool = adjectives[adjectiveKey]
+		adjectiveSelection = random.choice(list(adjectivePool)).capitalize()
+		nounKey = random.choice(list(nouns))
+		nounPool = nouns[nounKey]
+		nounSelection = random.choice(list(nounPool)).capitalize()
+		randomDigits = ''.join(random.choice(string.digits) for _ in range(4))
+		fileName = adjectiveSelection + nounSelection + randomDigits
+		return(fileName)
+	except Exception as e:
+		logHandler(e, 'filleNamer', 'ERROR')
 
 
 #main function: Function for the primary orchestration & running of the code
