@@ -117,7 +117,7 @@ def userInputHandler(systemInput):
 
 #Feature for generating a unique filename for each of the pubCrawl outputs.
 def fileNamer():
-	filePath = "./pubCrawl/fileNames/"
+	filePath = "./fileNames/"
 	adjectiveFile = "adjectives.txt"
 	adjectiveFilePath = filePath + adjectiveFile
 	adjectiveDataPool = fileReader(adjectiveFilePath)
