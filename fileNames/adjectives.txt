@@ -1,0 +1,6 @@
+{"Environment":["desert", "tundra", "mountain", "space", "field", "urban"],
+"StealthCunning":["hidden", "covert", "uncanny", "scheming", "decisive", "untouchable", "stalking"],
+"Volatility":["rowdy", "dangerous", "explosive", "threatening", "warring", "deadly", "killer", "insane", "wild"],
+"NegativeConnotation":["bad", "unnecessary", "unknown", "unexpected", "waning"],
+"Colors":["red", "orange", "yellow", "green", "blue", "violet"],
+"Adjectives":["draconic", "wireless", "spinning", "falling", "orbiting", "hunting", "chasing", "searching", "revealing", "flying", "destroyed", "inconceivable", "tarnished"]}

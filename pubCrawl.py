@@ -1,4 +1,4 @@
-#! python3 (3.9.5)
+#! python3
 # Version: 1.0
 # Developed Platform: Ubuntu Linux 20.04(Ubuntu 20.04.4 LTS)
 # Operation Platform: Debian Linux instances
@@ -6,6 +6,7 @@
 
 #*IMPORT BLOCK BEGIN*
 from bs4 import BeautifulSoup as bs
+import json
 import random
 import requests
 import re
@@ -14,6 +15,15 @@ import sys
 import datetime
 
 #*IMPORT BLOCK END*
+
+#*LAMBDA BLOCK BEGIN*
+#**INCOMPLETE BLOCK BEGIN**
+
+#!INCOMPLETE(Being Tested): Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict.
+dataPoolSorter = lambda data : json.loads(data)
+
+#**INCOMPLETE BLOCK END**
+#*LAMBDA BLOCK END*
 
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
@@ -37,6 +47,15 @@ def siteRepCheck():
 
 #***FUTURE VERSION BLOCK END***
 #***INCOMPLETE BLOCK BEGIN***
+
+#!INCOMPLETE(Being Tested): Function for reading exterior files & returning their value to requestor. Expected output: str.
+def fileReader(fullFileName):
+	try:
+		with open(fullFileName) as file:
+			data = file.read()
+		return data
+	except Exception as e:
+		logHandler(e, 'fileReader', 'ERROR')
 
 #!STUB(Being Tested): Function for gathering error information & recording it to a central location.
 def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
@@ -105,7 +124,7 @@ def fileNamer():
 	nounFilePath = filePath + nounFile
 	nounDataPool = fileReader(nounFilePath)
 	nouns = dataPoolSorter(nounDataPool)
-	
+
 	try:
 		adjectiveKey = random.choice(list(adjectives))
 		adjectivePool = adjectives[adjectiveKey]
