@@ -44,9 +44,8 @@ def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
 	fileName = logType + '_LOGS' + '.txt'
 	fullFilePath = "./output/logs/" + fileName
 	openMode = 'a+'
-	writeFile = open(fullFilePath, openMode)
-	writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
-	writeFile.close()
+	with open(fullFilePath, openMode) as writeFile:
+		writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
 	sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
 
 #***INCOMPLETE BLOCK BEGIN***
@@ -61,7 +60,6 @@ def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
 		with open(fullFilePath, mode) as fileWriter:
 			for link in providedData:
 				fileWriter.write('%s\n' % link)
-		fileWriter.close()
 	except Exception as e:
 		logHandler(e, 'dataParser', 'ERROR')
 #Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
