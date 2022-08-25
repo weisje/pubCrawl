@@ -1,8 +1,10 @@
 #! python3
-# Version: 1.0
-# Developed Platform: Ubuntu Linux 20.04(Ubuntu 20.04.4 LTS)
-# Operation Platform: Debian Linux instances
-# Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a provided URL for "actionable items"(URLs, redirects, resource references, etc).  
+'''
+Version: 1.0
+Developed Platform: Ubuntu Linux 20.04(Ubuntu 20.04.4 LTS)
+Operation Platform: Debian Linux instances
+Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a provided URL for "actionable items"(URLs, redirects, resource references, etc).  
+'''
 
 #*IMPORT BLOCK BEGIN*
 from bs4 import BeautifulSoup as bs
@@ -48,60 +50,14 @@ def siteRepCheck():
 #***FUTURE VERSION BLOCK END***
 #***INCOMPLETE BLOCK BEGIN***
 
-#!INCOMPLETE(Being Tested): Function for reading exterior files & returning their value to requestor. Expected output: str.
-def fileReader(fullFileName):
-	try:
-		with open(fullFileName) as file:
-			data = file.read()
-		return data
-	except Exception as e:
-		logHandler(e, 'fileReader', 'ERROR')
 
-#!STUB(Being Tested): Function for gathering error information & recording it to a central location.
-def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
-	logTime = datetime.datetime.now()
-	fileName = logType + '_LOGS' + '.txt'
-	fullFilePath = "./output/logs/" + fileName
-	openMode = 'a+'
-	with open(fullFilePath, openMode) as writeFile:
-		writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
-	sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
-
-#***INCOMPLETE BLOCK BEGIN***
+#***INCOMPLETE BLOCK END***
 #**STUB BLOCK END**
 
-#Function for parsing the data that is found from the siteScraper & saving it to a txt file.
-def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
-	try:
-		fileName = providedFileName + fileType
-		fileLocation = "./output/"
-		fullFilePath = fileLocation + fileName
-		with open(fullFilePath, mode) as fileWriter:
-			for link in providedData:
-				fileWriter.write('%s\n' % link)
-	except Exception as e:
-		logHandler(e, 'dataParser', 'ERROR')
-#Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
-def siteScraper(providedHTML):
-	urlList = []
-	try:
-		for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
-			print("\'href\': " + link.get('href'))
-			urlList.append("%s" % link.get('href'))
-		return(urlList)
-	except Exception as e:
-		logHandler(e, 'siteScraper', 'ERROR')
-
-#Function for negotiating & connecting to user supplied URL.
-def siteConnector(workingURL):
-	try:
-		response = requests.get(workingURL)
-		return(response.text)
-	except Exception as e:
-		logHandler(e, 'siteConnector', 'ERROR')
-
-#Function for accepting & parsing user input from the console line.  Expected input is from the sys.argv format that comes from the console.  
 def userInputHandler(systemInput):
+	'''
+	Function for accepting & parsing user input from the console line.  Expected input is from the sys.argv format that comes from the console.
+	'''
 	defaultURL = "http://scanme.nmap.org/"
 	try:
 		if(len(systemInput) <= 1):
@@ -113,8 +69,33 @@ def userInputHandler(systemInput):
 	except Exception as e:
 		logHandler(e, 'userInputHandler', 'ERROR')
 
-#Feature for generating a unique filename for each of the pubCrawl outputs.
+
+def __init__(self, inputURL):
+	'''
+	#!INCOMPLETE(Working to create pubCrawl class)
+	'''
+	self.inputURL = inputURL
+
+def run():
+	pass
+
+def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
+	'''
+	Function for gathering error information & recording it to a central location.
+	'''
+	logTime = datetime.datetime.now()
+	fileName = logType + '_LOGS' + '.txt'
+	fullFilePath = "./output/logs/" + fileName
+	openMode = 'a+'
+	writeFile = open(fullFilePath, openMode)
+	writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
+	writeFile.close()
+	sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
+
 def fileNamer():
+	'''
+	Feature for generating a unique filename for each of the pubCrawl outputs.
+	'''
 	filePath = "./fileNames/"
 	adjectiveFile = "adjectives.txt"
 	adjectiveFilePath = filePath + adjectiveFile
@@ -138,10 +119,62 @@ def fileNamer():
 	except Exception as e:
 		logHandler(e, 'filleNamer', 'ERROR')
 
+def fileReader(fullFileName):
+	'''
+	Function for reading exterior files & returning their content to requestor.
+	:param fullFileName: file location of data to be read & returned
+	:type fullFileName: str
+	:return: file data in str format
+	'''
+	try:
+		with open(fullFileName) as file:
+			data = file.read()
+		return data
+	except Exception as e:
+		logHandler(e, 'fileReader', 'ERROR')
 
-#main function: Function for the primary orchestration & running of the code
+def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
+	'''
+	Function for parsing the data that is found from the siteScraper & saving it to a txt file.
+	'''
+	try:
+		fileName = providedFileName + fileType
+		fileLocation = "./output/"
+		fullFilePath = fileLocation + fileName
+		with open(fullFilePath, mode) as fileWriter:
+			for link in providedData:
+				fileWriter.write('%s\n' % link)
+		fileWriter.close()
+	except Exception as e:
+		logHandler(e, 'dataParser', 'ERROR')
+
+def siteScraper(providedHTML):
+	'''
+	Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
+	'''
+	urlList = []
+	try:
+		for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
+			print("\'href\': " + link.get('href'))
+			urlList.append("%s" % link.get('href'))
+		return(urlList)
+	except Exception as e:
+		logHandler(e, 'siteScraper', 'ERROR')
+
+def siteConnector(workingURL):
+	'''
+	Function for negotiating & connecting to user supplied URL.
+	'''
+	try:
+		response = requests.get(workingURL)
+		return(response.text)
+	except Exception as e:
+		logHandler(e, 'siteConnector', 'ERROR')
+
 def main():
-	
+	'''
+	Function for the primary orchestration & running of the code
+	'''
 	workingURL = userInputHandler(sys.argv)
 	targetResponse = siteConnector(workingURL)
 	siteHTML = bs(targetResponse, 'html.parser')
