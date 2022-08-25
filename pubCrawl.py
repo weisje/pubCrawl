@@ -69,119 +69,128 @@ def userInputHandler(systemInput):
 	except Exception as e:
 		logHandler(e, 'userInputHandler', 'ERROR')
 
+class pubCrawl:
+	def __init__(self, inputURL):
+		'''
+		#!INCOMPLETE(Working to create pubCrawl class)
+		'''
+		self.inputURL = inputURL
 
-def __init__(self, inputURL):
-	'''
-	#!INCOMPLETE(Working to create pubCrawl class)
-	'''
-	self.inputURL = inputURL
+	def run(self):
+		workingURL = self.inputURL
+		targetResponse = self.siteConnector(workingURL)
+		siteHTML = bs(targetResponse, 'html.parser')
+		urlList = self.siteScraper(siteHTML)
+		fileName = self.fileNamer()
+		self.dataParser(urlList, fileName)
 
-def run():
-	pass
+	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION'):
+		'''
+		Function for gathering error information & recording it to a central location.
+		'''
+		logTime = datetime.datetime.now()
+		fileName = logType + '_LOGS' + '.txt'
+		fullFilePath = "./output/logs/" + fileName
+		openMode = 'a+'
+		writeFile = open(fullFilePath, openMode)
+		writeFile.write(str(logTime) +  " (" + functionSource + "): " + str(loggingData) + ";\n")
+		writeFile.close()
+		sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
 
-def logHandler(loggingData, functionSource, logType = 'INFORMATION'):
-	'''
-	Function for gathering error information & recording it to a central location.
-	'''
-	logTime = datetime.datetime.now()
-	fileName = logType + '_LOGS' + '.txt'
-	fullFilePath = "./output/logs/" + fileName
-	openMode = 'a+'
-	writeFile = open(fullFilePath, openMode)
-	writeFile.write(str(logTime) +  " (" + functionSource + "): " + loggingData + ";\n")
-	writeFile.close()
-	sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
+	def fileNamer(self):
+		'''
+		Feature for generating a unique filename for each of the pubCrawl outputs.
+		'''
+		filePath = "./fileNames/"
+		adjectiveFile = "adjectives.txt"
+		adjectiveFilePath = filePath + adjectiveFile
+		adjectiveDataPool = self.fileReader(adjectiveFilePath)
+		adjectives = dataPoolSorter(adjectiveDataPool)
+		nounFile = "nouns.txt"
+		nounFilePath = filePath + nounFile
+		nounDataPool = self.fileReader(nounFilePath)
+		nouns = dataPoolSorter(nounDataPool)
 
-def fileNamer():
-	'''
-	Feature for generating a unique filename for each of the pubCrawl outputs.
-	'''
-	filePath = "./fileNames/"
-	adjectiveFile = "adjectives.txt"
-	adjectiveFilePath = filePath + adjectiveFile
-	adjectiveDataPool = fileReader(adjectiveFilePath)
-	adjectives = dataPoolSorter(adjectiveDataPool)
-	nounFile = "nouns.txt"
-	nounFilePath = filePath + nounFile
-	nounDataPool = fileReader(nounFilePath)
-	nouns = dataPoolSorter(nounDataPool)
+		try:
+			adjectiveKey = random.choice(list(adjectives))
+			adjectivePool = adjectives[adjectiveKey]
+			adjectiveSelection = random.choice(list(adjectivePool)).capitalize()
+			nounKey = random.choice(list(nouns))
+			nounPool = nouns[nounKey]
+			nounSelection = random.choice(list(nounPool)).capitalize()
+			randomDigits = ''.join(random.choice(string.digits) for _ in range(4))
+			fileName = adjectiveSelection + nounSelection + randomDigits
+			return(fileName)
+		except Exception as e:
+			self.logHandler(e, 'filleNamer', 'ERROR')
 
-	try:
-		adjectiveKey = random.choice(list(adjectives))
-		adjectivePool = adjectives[adjectiveKey]
-		adjectiveSelection = random.choice(list(adjectivePool)).capitalize()
-		nounKey = random.choice(list(nouns))
-		nounPool = nouns[nounKey]
-		nounSelection = random.choice(list(nounPool)).capitalize()
-		randomDigits = ''.join(random.choice(string.digits) for _ in range(4))
-		fileName = adjectiveSelection + nounSelection + randomDigits
-		return(fileName)
-	except Exception as e:
-		logHandler(e, 'filleNamer', 'ERROR')
+	def fileReader(self, fullFileName):
+		'''
+		Function for reading exterior files & returning their content to requestor.
+		:param fullFileName: file location of data to be read & returned
+		:type fullFileName: str
+		:return: file data in str format
+		'''
+		try:
+			with open(fullFileName) as file:
+				data = file.read()
+			return data
+		except Exception as e:
+			self.logHandler(e, 'fileReader', 'ERROR')
 
-def fileReader(fullFileName):
-	'''
-	Function for reading exterior files & returning their content to requestor.
-	:param fullFileName: file location of data to be read & returned
-	:type fullFileName: str
-	:return: file data in str format
-	'''
-	try:
-		with open(fullFileName) as file:
-			data = file.read()
-		return data
-	except Exception as e:
-		logHandler(e, 'fileReader', 'ERROR')
+	def dataParser(self, providedData, providedFileName, mode = 'w', fileType = ".txt"):
+		'''
+		Function for parsing the data that is found from the siteScraper & saving it to a txt file.
+		'''
+		try:
+			fileName = providedFileName + fileType
+			fileLocation = "./output/"
+			fullFilePath = fileLocation + fileName
+			with open(fullFilePath, mode) as fileWriter:
+				for link in providedData:
+					fileWriter.write('%s\n' % link)
+			fileWriter.close()
+		except Exception as e:
+			self.logHandler(e, 'dataParser', 'ERROR')
 
-def dataParser(providedData, providedFileName, mode = 'w', fileType = ".txt"):
-	'''
-	Function for parsing the data that is found from the siteScraper & saving it to a txt file.
-	'''
-	try:
-		fileName = providedFileName + fileType
-		fileLocation = "./output/"
-		fullFilePath = fileLocation + fileName
-		with open(fullFilePath, mode) as fileWriter:
-			for link in providedData:
-				fileWriter.write('%s\n' % link)
-		fileWriter.close()
-	except Exception as e:
-		logHandler(e, 'dataParser', 'ERROR')
+	def siteScraper(self, providedHTML):
+		'''
+		Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
+		'''
+		urlList = []
+		try:
+			for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
+				print("\'href\': " + link.get('href'))
+				urlList.append("%s" % link.get('href'))
+			return(urlList)
+		except Exception as e:
+			self.logHandler(e, 'siteScraper', 'ERROR')
 
-def siteScraper(providedHTML):
-	'''
-	Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
-	'''
-	urlList = []
-	try:
-		for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
-			print("\'href\': " + link.get('href'))
-			urlList.append("%s" % link.get('href'))
-		return(urlList)
-	except Exception as e:
-		logHandler(e, 'siteScraper', 'ERROR')
-
-def siteConnector(workingURL):
-	'''
-	Function for negotiating & connecting to user supplied URL.
-	'''
-	try:
-		response = requests.get(workingURL)
-		return(response.text)
-	except Exception as e:
-		logHandler(e, 'siteConnector', 'ERROR')
+	def siteConnector(self, workingURL):
+		'''
+		Function for negotiating & connecting to user supplied URL.
+		'''
+		try:
+			response = requests.get(workingURL)
+			return(response.text)
+		except Exception as e:
+			self.logHandler(e, 'siteConnector', 'ERROR')
 
 def main():
 	'''
 	Function for the primary orchestration & running of the code
-	'''
+
 	workingURL = userInputHandler(sys.argv)
 	targetResponse = siteConnector(workingURL)
 	siteHTML = bs(targetResponse, 'html.parser')
 	urlList = siteScraper(siteHTML)
 	fileName = fileNamer()
 	dataParser(urlList, fileName)
+	'''
 
+	workingURL = userInputHandler(sys.argv)
+	pub_crawl = pubCrawl(workingURL)
+	pub_crawl.run()
 
 #*FUNCTION BLOCK END*
 
