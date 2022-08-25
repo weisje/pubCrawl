@@ -124,7 +124,7 @@ def fileNamer():
 	nounFilePath = filePath + nounFile
 	nounDataPool = fileReader(nounFilePath)
 	nouns = dataPoolSorter(nounDataPool)
-  
+
 	try:
 		adjectiveKey = random.choice(list(adjectives))
 		adjectivePool = adjectives[adjectiveKey]
