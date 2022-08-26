@@ -15,48 +15,57 @@ import re
 import string
 import sys
 import datetime
-
 #*IMPORT BLOCK END*
 
 #*LAMBDA BLOCK BEGIN*
 #**INCOMPLETE BLOCK BEGIN**
+#**INCOMPLETE BLOCK END**
 
-#!INCOMPLETE(Being Tested): Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict.
+#Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict.
 dataPoolSorter = lambda data : json.loads(data)
 
-#**INCOMPLETE BLOCK END**
 #*LAMBDA BLOCK END*
 
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
 #***FUTURE VERSION BLOCK BEGIN***
-
-#!STUB(Version 2.0 Feature): Function for attempting to clean up user's input & parsing it properly for future connection/handling.
 def userInputParser(providedURL):
+	'''
+	#!STUB(Version 2.0 Feature)
+	Function for attempting to clean up user's input & parsing it properly for future connection/handling.
+	'''
 	try:
 		return providedURL
 	except Exception as e:
 		logHandler(e, 'userInputParser', 'ERROR')
 
-#STUB(Version 2.0 Feature): Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
 def recursiveDepthManager(intDepth = 1):
+	'''
+	#!STUB(Version 2.0 Feature)
+	Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
+	'''
 	if(intDepth == 1):
 		pass
 
-#STUB(Version 3.0 Feature): Function for integrating API calls on malicious site checkers(Brightcloud, Virustotal, etc) to automatically check provided URLs for malicious activity/poor community reputation.
 def siteRepCheck():
+	'''
+	#!STUB(Version 3.0 Feature)
+	Function for integrating API calls on malicious site checkers(Brightcloud, Virustotal, etc) to automatically check provided URLs for malicious activity/poor community reputation.
+	'''
 	pass
 
 #***FUTURE VERSION BLOCK END***
 #***INCOMPLETE BLOCK BEGIN***
-
 
 #***INCOMPLETE BLOCK END***
 #**STUB BLOCK END**
 
 def userInputHandler(systemInput):
 	'''
-	Function for accepting & parsing user input from the console line.  Expected input is from the sys.argv format that comes from the console.
+	Function for accepting & parsing user input from the console line.  Will return a default value(defaultURL) if no value is given by the user.
+	:param systemInput: Input Data
+	:type systemInput: str
+	:return: url as str
 	'''
 	defaultURL = "http://scanme.nmap.org/"
 	try:
@@ -72,11 +81,14 @@ def userInputHandler(systemInput):
 class pubCrawl:
 	def __init__(self, inputURL):
 		'''
-		#!INCOMPLETE(Working to create pubCrawl class)
+		Function for initializing the pubCrawl class when it is called.
 		'''
 		self.inputURL = inputURL
 
 	def run(self):
+		'''
+		Function for activating & operating the pubCrawl class in the anticipated order & manner.
+		'''
 		workingURL = self.inputURL
 		targetResponse = self.siteConnector(workingURL)
 		siteHTML = bs(targetResponse, 'html.parser')
@@ -87,19 +99,29 @@ class pubCrawl:
 	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION'):
 		'''
 		Function for gathering error information & recording it to a central location.
+		:param loggingData: Exception data provided by the calling function that is to be recorded.
+		:type loggingData: str
+		:param functionSource: Name of the function that is calling logHandler() so it can be recorded for logs.
+		:type functionSource: str
+		:param logType: Exception type provided by calling function to be recorded.
+		:type logType: str
 		'''
+		loggingData = str(loggingData)
+		functionSource = str(functionSource)
+		logType = str(logType)
 		logTime = datetime.datetime.now()
+		logTime = str(logTime)
 		fileName = logType + '_LOGS' + '.txt'
 		fullFilePath = "./output/logs/" + fileName
 		openMode = 'a+'
-		writeFile = open(fullFilePath, openMode)
-		writeFile.write(str(logTime) +  " (" + functionSource + "): " + str(loggingData) + ";\n")
-		writeFile.close()
+		with open(fullFilePath, openMode) as writeFile:
+			writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
 		sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
 
 	def fileNamer(self):
 		'''
 		Feature for generating a unique filename for each of the pubCrawl outputs.
+		:return: str in format ADJECTIVENOUN####
 		'''
 		filePath = "./fileNames/"
 		adjectiveFile = "adjectives.txt"
@@ -138,10 +160,17 @@ class pubCrawl:
 		except Exception as e:
 			self.logHandler(e, 'fileReader', 'ERROR')
 
-	def dataParser(self, providedData, providedFileName, mode = 'w', fileType = ".txt"):
+	def dataParser(self, providedData, providedFileName, fileType = ".txt"):
 		'''
-		Function for parsing the data that is found from the siteScraper & saving it to a txt file.
+		Function for parsing the data that is found from the siteScraper & saving it to a data file.
+		:param providedData: Data provided by calling function that will be written to the file
+		:type providedData: str
+		:param providedFileName: File name that is provided by calling function that the data will be written to.
+		:type providedFileName: str
+		:param fileType: the filetype of the file that the data will be written to.
+		:type fileType: str
 		'''
+		mode = 'w'
 		try:
 			fileName = providedFileName + fileType
 			fileLocation = "./output/"
@@ -149,13 +178,15 @@ class pubCrawl:
 			with open(fullFilePath, mode) as fileWriter:
 				for link in providedData:
 					fileWriter.write('%s\n' % link)
-			fileWriter.close()
 		except Exception as e:
 			self.logHandler(e, 'dataParser', 'ERROR')
 
 	def siteScraper(self, providedHTML):
 		'''
 		Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
+		:param providedHTML: HTML provided by the calling function that will be searched for available URLs
+		:type providedHTML: str
+		:return: modified list
 		'''
 		urlList = []
 		try:
@@ -169,6 +200,9 @@ class pubCrawl:
 	def siteConnector(self, workingURL):
 		'''
 		Function for negotiating & connecting to user supplied URL.
+		:param workingURL: URL provided by calling function that will be connected to by siteConnector()
+		:type workingURL: str
+		:return: str
 		'''
 		try:
 			response = requests.get(workingURL)
@@ -179,13 +213,6 @@ class pubCrawl:
 def main():
 	'''
 	Function for the primary orchestration & running of the code
-
-	workingURL = userInputHandler(sys.argv)
-	targetResponse = siteConnector(workingURL)
-	siteHTML = bs(targetResponse, 'html.parser')
-	urlList = siteScraper(siteHTML)
-	fileName = fileNamer()
-	dataParser(urlList, fileName)
 	'''
 
 	workingURL = userInputHandler(sys.argv)
