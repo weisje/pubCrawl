@@ -8,13 +8,14 @@ Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a p
 
 #*IMPORT BLOCK BEGIN*
 from bs4 import BeautifulSoup as bs
+import datetime
 import json
+import os.path
 import random
 import requests
 import re
 import string
 import sys
-import datetime
 #*IMPORT BLOCK END*
 
 #*LAMBDA BLOCK BEGIN*
@@ -23,6 +24,7 @@ import datetime
 
 #Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict.
 dataPoolSorter = lambda data : json.loads(data)
+pathCombiner = lambda firstFileValue, secondFileValue : os.path.join(firstFileValue, secondFileValue)
 
 #*LAMBDA BLOCK END*
 
@@ -112,7 +114,8 @@ class pubCrawl:
 		logTime = datetime.datetime.now()
 		logTime = str(logTime)
 		fileName = logType + '_LOGS' + '.txt'
-		fullFilePath = "./output/logs/" + fileName
+		logFilePath = pathCombiner("output","logs")
+		fullFilePath = pathCombiner(logFilePath,fileName)
 		openMode = 'a+'
 		with open(fullFilePath, openMode) as writeFile:
 			writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
@@ -123,13 +126,10 @@ class pubCrawl:
 		Feature for generating a unique filename for each of the pubCrawl outputs.
 		:return: str in format ADJECTIVENOUN####
 		'''
-		filePath = "./fileNames/"
-		adjectiveFile = "adjectives.txt"
-		adjectiveFilePath = filePath + adjectiveFile
+		adjectiveFilePath = pathCombiner("fileNames","adjectives.txt")
 		adjectiveDataPool = self.fileReader(adjectiveFilePath)
 		adjectives = dataPoolSorter(adjectiveDataPool)
-		nounFile = "nouns.txt"
-		nounFilePath = filePath + nounFile
+		nounFilePath = pathCombiner("fileNames","nouns.txt")
 		nounDataPool = self.fileReader(nounFilePath)
 		nouns = dataPoolSorter(nounDataPool)
 
@@ -173,8 +173,7 @@ class pubCrawl:
 		mode = 'w'
 		try:
 			fileName = providedFileName + fileType
-			fileLocation = "./output/"
-			fullFilePath = fileLocation + fileName
+			fullFilePath = pathCombiner("output",fileName)
 			with open(fullFilePath, mode) as fileWriter:
 				for link in providedData:
 					fileWriter.write('%s\n' % link)
