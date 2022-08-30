@@ -8,6 +8,8 @@ Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a p
 
 #*IMPORT BLOCK BEGIN*
 from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options as firefoxOptions
 import datetime
 import json
 import os.path
@@ -91,6 +93,7 @@ class pubCrawl:
 		'''
 		Function for activating & operating the pubCrawl class in the anticipated order & manner.
 		'''
+		self.dynamicConnectorFirefox()
 		workingURL = self.inputURL
 		targetResponse = self.siteConnector(workingURL)
 		siteHTML = bs(targetResponse, 'html.parser')
@@ -208,6 +211,20 @@ class pubCrawl:
 			return(response.text)
 		except Exception as e:
 			self.logHandler(e, 'siteConnector', 'ERROR')
+
+	def dynamicConnectorFirefox(self):
+		'''
+		!STUB(Incomplete: Being developed)
+		Function for creating a Selenium web browser driver in Firefox
+		:return: selenium.webdriver.firefox.webdriver.WebDriver
+		'''
+		try:
+			options = firefoxOptions()
+			options.add_argument("--headless") #This line is to assure that a browser window does not open on the user's screen.  This line can be commented out if you want to open n number of browser windows where n is equal to the number of URLs being scraped.
+			driver = webdriver.Firefox(options=options)
+			return driver
+		except Exception as e:
+			self.logHandler(e, "dynamicConnectorFirefox", "ERROR")
 
 def main():
 	'''
