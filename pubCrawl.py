@@ -93,13 +93,16 @@ class pubCrawl:
 		'''
 		Function for activating & operating the pubCrawl class in the anticipated order & manner.
 		'''
-		self.dynamicConnectorFirefox()
 		workingURL = self.inputURL
+		print(f"URL to be scraped: {workingURL}")
+		dynamicURLList = self.dynamicSiteGrabber(self.dynamicConnectorFirefox(),workingURL)
 		targetResponse = self.siteConnector(workingURL)
 		siteHTML = bs(targetResponse, 'html.parser')
-		urlList = self.siteScraper(siteHTML)
+		staticURLList = self.siteScraper(siteHTML)
+		uniqueURLList = self.listSorter(dynamicURLList,staticURLList)
 		fileName = self.fileNamer()
-		self.dataParser(urlList, fileName)
+		self.dataParser(uniqueURLList, fileName)
+		print(f"Results stored to {fileName}")
 
 	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION'):
 		'''
@@ -122,7 +125,8 @@ class pubCrawl:
 		openMode = 'a+'
 		with open(fullFilePath, openMode) as writeFile:
 			writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
-		sys.exit("Log written to: " + fileName + "\npubCrawl.py Exiting.")
+		print(f"During runtime {functionSource} met a logable event type {logType}")
+		sys.exit(f"Log written to: {fullFilePath}\npubCrawl.py Exiting.")
 
 	def fileNamer(self):
 		'''
@@ -193,7 +197,7 @@ class pubCrawl:
 		urlList = []
 		try:
 			for link in providedHTML.find_all(attrs={'href': re.compile("^https?://")}):
-				print("\'href\': " + link.get('href'))
+				#print("\'href\': " + link.get('href'))
 				urlList.append("%s" % link.get('href'))
 			return(urlList)
 		except Exception as e:
@@ -214,8 +218,7 @@ class pubCrawl:
 
 	def dynamicConnectorFirefox(self):
 		'''
-		!STUB(Incomplete: Being developed)
-		Function for creating a Selenium web browser driver in Firefox
+	Function for creating a Selenium web browser driver in Firefox
 		:return: selenium.webdriver.firefox.webdriver.WebDriver
 		'''
 		try:
@@ -224,7 +227,57 @@ class pubCrawl:
 			driver = webdriver.Firefox(options=options)
 			return driver
 		except Exception as e:
-			self.logHandler(e, "dynamicConnectorFirefox", "ERROR")
+			self.logHandler(e, 'dynamicConnectorFirefox', 'ERROR')
+
+	def dynamicSiteGrabber(self,providedDriver,providedURL,searchingElement1 = 'tag name',searchingElement2 = 'a',retrievingAttribute = 'href'):
+		'''
+		Function for running & grabbing HTML elements from a site after it has been summoned.  Function then searches for elements on the page to be returned.
+		:param providedDriver: Driver that has been generated via selenium for calling on the website
+		:type providedDriver: selenium.webdriver.firefox.webdriver.WebDriver
+		:param providedURL: Provided URL that will be summoned & scraped for information
+		:type providedURL: str
+		:param searchingElement1: The type of element that is to be searched for in resulting HTML once the site has been summoned.
+		:type searchingElement1: str
+		:param searchingElement2: Subtype of element that is to be searched for in resulting HTML when the site has been summoned.
+		:type searchingElement2: str
+		:param retrievingAttribute: Type of element that will be scanned for & retrieved to be returned to the calling function
+		:type retrievingAttribute: str
+		:return: list
+		'''
+		try:
+			foundURLs = []
+			driver = providedDriver
+			driver.get(providedURL)
+			allLinks = driver.find_elements(searchingElement1,searchingElement2)
+			for elem in allLinks:
+				foundURLs.append(elem.get_attribute(retrievingAttribute))
+			return foundURLs
+		except Exception as e:
+			self.logHandler(e, 'dynamicSiteGrabber', 'ERROR')
+
+	def listSorter(self,providedList1, providedList2):
+		'''
+		:param providedList1: Content provided to the function to be compared to providedList2 & sorted
+		:type providedList1: list
+		:param providedList2: Content provided to the fuction to be compared to providedList1 for unique values & sorted
+		:type providedList2: list
+		:return : list
+		'''
+		try:
+			uniqueList = []
+			for element1 in providedList1:
+				if element1 in uniqueList:
+					continue
+				else:
+					uniqueList.append(element1)
+			for element2 in providedList2:
+				if element2 in uniqueList:
+					continue
+				else:
+					uniqueList.append(element2)
+			return uniqueList
+		except Exception as e:
+			self.logHandler(e,'listSorter','ERROR')
 
 def main():
 	'''
