@@ -1,6 +1,6 @@
 #! python3
 '''
-Version: 1.0
+Version: 1.2
 Developed Platform: Ubuntu Linux 20.04(Ubuntu 20.04.4 LTS)
 Operation Platform: Debian Linux instances
 Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a provided URL for "actionable items"(URLs, redirects, resource references, etc).  
@@ -24,10 +24,6 @@ import sys
 #**INCOMPLETE BLOCK BEGIN**
 #**INCOMPLETE BLOCK END**
 
-#Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict.
-dataPoolSorter = lambda data : json.loads(data)
-pathCombiner = lambda firstFileValue, secondFileValue : os.path.join(firstFileValue, secondFileValue)
-
 #*LAMBDA BLOCK END*
 
 #*FUNCTION BLOCK BEGIN*
@@ -43,25 +39,7 @@ def userInputParser(providedURL):
 	except Exception as e:
 		logHandler(e, 'userInputParser', 'ERROR')
 
-def recursiveDepthManager(intDepth = 1):
-	'''
-	#!STUB(Version 2.0 Feature)
-	Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
-	'''
-	if(intDepth == 1):
-		pass
-
-def siteRepCheck():
-	'''
-	#!STUB(Version 3.0 Feature)
-	Function for integrating API calls on malicious site checkers(Brightcloud, Virustotal, etc) to automatically check provided URLs for malicious activity/poor community reputation.
-	'''
-	pass
-
 #***FUTURE VERSION BLOCK END***
-#***INCOMPLETE BLOCK BEGIN***
-
-#***INCOMPLETE BLOCK END***
 #**STUB BLOCK END**
 
 def userInputHandler(systemInput):
@@ -71,7 +49,7 @@ def userInputHandler(systemInput):
 	:type systemInput: str
 	:return: url as str
 	'''
-	defaultURL = "http://scanme.nmap.org/"
+	defaultURL = "https://www.instagram.com/"
 	try:
 		if(len(systemInput) <= 1):
 			cleanedURL = defaultURL
@@ -80,29 +58,72 @@ def userInputHandler(systemInput):
 			cleanedURL = userInputParser(providedURL)
 		return(cleanedURL)
 	except Exception as e:
-		logHandler(e, 'userInputHandler', 'ERROR')
+		logger = pubCrawl(systemInput)
+		logger.logHandler(e, 'userInputHandler', 'ERROR')
 
 class pubCrawl:
+	'''
+	Class designed scrape target site/URL's code for visible URLs.  It will then take the results & write them to a text file for review. 
+	'''
+	#*STUB BLOCK BEGIN**
+	#**FUTURE VERSION BLOCK BEGIN***
+	def recursiveDepthManager(self,intDepth = 1):
+		'''
+		#!STUB(Version 2.0 Feature)
+		Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
+		'''
+		if(intDepth == 1):
+			pass
+
+	def siteRepCheck(self):
+		'''
+		#!STUB(Version 3.0 Feature)
+		Function for integrating API calls on malicious site checkers(Brightcloud, Virustotal, etc) to automatically check provided URLs for malicious activity/poor community reputation.
+		'''
+		pass
+
+	#**FUTURE VERSION BLOCK END***
+	#*STUB BLOCK END**
+
+	#Lambda designed to read str pool of data & output it as a dictionary.  Expected output: dict
+	dataPoolSorter = lambda self, data : json.loads(data)
+
+	#Lambda designed to provide ease of operating system filepath construction.  Expected output: str
+	pathCombiner = lambda self, firstFileValue, secondFileValue : os.path.join(firstFileValue, secondFileValue)
+
 	def __init__(self, inputURL):
 		'''
 		Function for initializing the pubCrawl class when it is called.
 		'''
 		self.inputURL = inputURL
 
-	def run(self):
+	def scrapeDynamicSite(self,inputURL):
 		'''
-		Function for activating & operating the pubCrawl class in the anticipated order & manner.
+		Function designed to gather & return URLs from websites that require activation before they can be properly scraped for URLs.
+		:param inputURL: URL of the target to be scraped
+		:type inputURL: str
+		:return: list
 		'''
-		workingURL = self.inputURL
-		print(f"URL to be scraped: {workingURL}")
-		dynamicURLList = self.dynamicSiteGrabber(self.dynamicConnectorFirefox(),workingURL)
-		targetResponse = self.siteConnector(workingURL)
-		siteHTML = bs(targetResponse, 'html.parser')
-		staticURLList = self.siteScraper(siteHTML)
-		uniqueURLList = self.listSorter(dynamicURLList,staticURLList)
-		fileName = self.fileNamer()
-		self.dataParser(uniqueURLList, fileName)
-		print(f"Results stored to {fileName}")
+		try:
+			dynamicURLList = self.dynamicSiteGrabber(self.dynamicConnectorFirefox(),inputURL)
+			return(dynamicURLList)
+		except Exception as e:
+			self.logHandler(e, 'scrapeDynamicSite', 'ERROR')
+
+	def scrapeStaticSite(self,inputURL):
+		'''
+		Function designed to gather & return URLs from websites that are static & have HTML available to be scraped without dynamic code activitation.
+		:param inputURL: URL of the target to be scraped
+		:type inputURL: str
+		:return: list
+		'''
+		try:
+			targetResponse = self.siteConnector(inputURL)
+			siteHTML = bs(targetResponse, 'html.parser')
+			staticURLList = self.staticSiteScraper(siteHTML)
+			return staticURLList
+		except Exception as e:
+			self.logHandler(e, 'scrapeStaticSite', 'ERROR')
 
 	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION'):
 		'''
@@ -120,8 +141,8 @@ class pubCrawl:
 		logTime = datetime.datetime.now()
 		logTime = str(logTime)
 		fileName = logType + '_LOGS' + '.txt'
-		logFilePath = pathCombiner("output","logs")
-		fullFilePath = pathCombiner(logFilePath,fileName)
+		logFilePath = self.pathCombiner("output","logs")
+		fullFilePath = self.pathCombiner(logFilePath,fileName)
 		openMode = 'a+'
 		with open(fullFilePath, openMode) as writeFile:
 			writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
@@ -133,12 +154,12 @@ class pubCrawl:
 		Feature for generating a unique filename for each of the pubCrawl outputs.
 		:return: str in format ADJECTIVENOUN####
 		'''
-		adjectiveFilePath = pathCombiner("fileNames","adjectives.txt")
+		adjectiveFilePath = self.pathCombiner("fileNames","adjectives.txt")
 		adjectiveDataPool = self.fileReader(adjectiveFilePath)
-		adjectives = dataPoolSorter(adjectiveDataPool)
-		nounFilePath = pathCombiner("fileNames","nouns.txt")
+		adjectives = self.dataPoolSorter(adjectiveDataPool)
+		nounFilePath = self.pathCombiner("fileNames","nouns.txt")
 		nounDataPool = self.fileReader(nounFilePath)
-		nouns = dataPoolSorter(nounDataPool)
+		nouns = self.dataPoolSorter(nounDataPool)
 
 		try:
 			adjectiveKey = random.choice(list(adjectives))
@@ -167,9 +188,9 @@ class pubCrawl:
 		except Exception as e:
 			self.logHandler(e, 'fileReader', 'ERROR')
 
-	def dataParser(self, providedData, providedFileName, fileType = ".txt"):
+	def dataParser(self, targetSite, providedData, providedFileName, fileType = ".txt"):
 		'''
-		Function for parsing the data that is found from the siteScraper & saving it to a data file.
+		Function for parsing the data that is found from the staticSiteScraper & saving it to a data file.
 		:param providedData: Data provided by calling function that will be written to the file
 		:type providedData: str
 		:param providedFileName: File name that is provided by calling function that the data will be written to.
@@ -180,14 +201,15 @@ class pubCrawl:
 		mode = 'w'
 		try:
 			fileName = providedFileName + fileType
-			fullFilePath = pathCombiner("output",fileName)
+			fullFilePath = self.pathCombiner("output",fileName)
 			with open(fullFilePath, mode) as fileWriter:
+				fileWriter.write(f'URL Scraped: {targetSite}\n')
 				for link in providedData:
-					fileWriter.write('%s\n' % link)
+					fileWriter.write(f'{link}\n')
 		except Exception as e:
 			self.logHandler(e, 'dataParser', 'ERROR')
 
-	def siteScraper(self, providedHTML):
+	def staticSiteScraper(self, providedHTML):
 		'''
 		Function for scraping the URL provided by the user for usable information that is stored in the HTML(via hrefs).
 		:param providedHTML: HTML provided by the calling function that will be searched for available URLs
@@ -201,7 +223,7 @@ class pubCrawl:
 				urlList.append("%s" % link.get('href'))
 			return(urlList)
 		except Exception as e:
-			self.logHandler(e, 'siteScraper', 'ERROR')
+			self.logHandler(e, 'staticSiteScraper', 'ERROR')
 
 	def siteConnector(self, workingURL):
 		'''
@@ -255,29 +277,29 @@ class pubCrawl:
 		except Exception as e:
 			self.logHandler(e, 'dynamicSiteGrabber', 'ERROR')
 
-	def listSorter(self,providedList1, providedList2):
+	def scrapeSite(self,targetType='HYBRIDSITE'):
 		'''
-		:param providedList1: Content provided to the function to be compared to providedList2 & sorted
-		:type providedList1: list
-		:param providedList2: Content provided to the fuction to be compared to providedList1 for unique values & sorted
-		:type providedList2: list
-		:return : list
+		Function for activating & operating the pubCrawl class in the anticipated order & manner if the user is planning on performing both static & dynamic scraping.
 		'''
-		try:
-			uniqueList = []
-			for element1 in providedList1:
-				if element1 in uniqueList:
-					continue
-				else:
-					uniqueList.append(element1)
-			for element2 in providedList2:
-				if element2 in uniqueList:
-					continue
-				else:
-					uniqueList.append(element2)
-			return uniqueList
-		except Exception as e:
-			self.logHandler(e,'listSorter','ERROR')
+		workingURL = self.inputURL
+		targetType = targetType.upper()
+		print(f"URL to be scraped: {workingURL}")
+		if(targetType == 'HYBRIDSITE'):
+			staticURLList = self.scrapeStaticSite(workingURL)
+			dynamicURLList = self.scrapeDynamicSite(workingURL)
+			uniqueURLList = set.union(set(staticURLList),set(dynamicURLList))
+		elif(targetType == 'DYNAMICSITE'):
+			uniqueURLList = self.scrapeDynamicSite(workingURL)
+			uniqueURLList = set(uniqueURLList)
+		elif(targetType == 'STATICSITE'):
+			uniqueURLList = self.scrapeStaticSite(workingURL)
+			uniqueURLList = set(uniqueURLList)
+		else:
+			sys.exit(f'{targetType} is not a valid targetType value. Try again with one of the following:\n\n\tHYBRIDSITE\n\tDYNAMICSITE\n\tSTATICSITE\n')
+
+		fileName = self.fileNamer()
+		self.dataParser(workingURL,uniqueURLList, fileName)
+		print(f"Results stored to {fileName}")
 
 def main():
 	'''
@@ -286,7 +308,7 @@ def main():
 
 	workingURL = userInputHandler(sys.argv)
 	pub_crawl = pubCrawl(workingURL)
-	pub_crawl.run()
+	pub_crawl.scrapeSite()
 
 #*FUNCTION BLOCK END*
 
