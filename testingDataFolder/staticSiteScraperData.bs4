@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Go ahead and ScanMe!</title>
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#2A0D45">
+<link rel="stylesheet" href="/shared/css/main.css" type="text/css">
+<link rel="stylesheet" href="/site.css" type="text/css">
+<!--Google Analytics Code-->
+<link rel="preload" href="https://www.google-analytics.com/analytics.js" as="script">
+<script async src="/shared/ga.js"></script>
+<!--END Google Analytics Code-->
+<META NAME="ROBOTS" CONTENT="NOARCHIVE">
+<link rel="shortcut icon" href="/shared/images/tiny-eyeicon.png" type="image/png">
+</head>
+<body>
+<div id="nwrapper">
+<div id="grid">
+<header id="logo">
+<a href="/"><img alt="Home page logo" src="/images/sitelogo.png" height=90 width=168></a>
+</header>
+
+<nav id="sidebar" class="purple">
+
+<!-- SECWIKI PORTAL INSERT -->
+
+<ul>
+<li><a href="https://nmap.org/">Nmap Security Scanner</a>
+<ul>
+<li><a href="https://nmap.org/book/man.html">Ref Guide</a></li>
+<li><a href="https://nmap.org/book/install.html">Install Guide</a></li>
+<li><a href="https://nmap.org/download.html">Download</a></li>
+<li><a href="https://nmap.org/changelog.html">Changelog</a></li>
+<li><a href="https://nmap.org/book/">Book</a></li>
+<li><a href="https://nmap.org/docs.html">Docs</a></li>
+</ul>
+<li><a href="https://npcap.com/">Npcap packet capture library</a>
+<ul>
+<li><a href="https://npcap.com/guide/">User's Guide</a></li>
+<li><a href="https://npcap.com/guide/npcap-devguide.html#npcap-api">API docs</a></li>
+<li><a href="https://npcap.com/#download">Download</a></li>
+<li><a href="https://npcap.com/changelog">Changelog</a></li>
+</ul>
+<li><a href="https://seclists.org/">Security Lists</a>
+<ul>
+<li><a href="https://seclists.org/nmap-announce/">Nmap Announce</a></li>
+<li><a href="https://seclists.org/nmap-dev/">Nmap Dev</a></li>
+<li><a href="https://seclists.org/bugtraq/">Bugtraq</a></li>
+<li><a href="https://seclists.org/fulldisclosure/">Full Disclosure</a></li>
+<li><a href="https://seclists.org/pen-test/">Pen Test</a></li>
+<li><a href="https://seclists.org/basics/">Basics</a></li>
+<li><a href="https://seclists.org/">More</a></li>
+</ul>
+<li><a href="https://sectools.org">Security Tools</a>
+<ul>
+<li><a href="https://sectools.org/tag/pass-audit/">Password audit</a></li>
+<li><a href="https://sectools.org/tag/sniffers/">Sniffers</a></li>
+<li><a href="https://sectools.org/tag/vuln-scanners/">Vuln scanners</a></li>
+<li><a href="https://sectools.org/tag/web-scanners/">Web scanners</a></li>
+<li><a href="https://sectools.org/tag/wireless/">Wireless</a></li>
+<li><a href="https://sectools.org/tag/sploits/">Exploitation</a></li>
+<li><a href="https://sectools.org/tag/packet-crafters/">Packet crafters</a></li>
+<li><a href="https://sectools.org/">More</a></li>
+</ul>
+<li><a href="https://insecure.org/">Site News</a></li>
+<li><a href="https://insecure.org/advertising.html">Advertising</a></li>
+<li><a href="https://insecure.org/fyodor/">About/Contact</a></li>
+<!-- These can come back if I ever update them ...
+<li><a href="https://insecure.org/links.html">Exceptional Links</a></li>
+<li><a href="https://insecure.org/reading.html">Good Reading</a></li>
+<li><a href="https://insecure.org/sploits.html">Exploit World</a></li>
+-->
+</ul>
+<form id="sb-search" action="/search/">
+<input name="q" type="text" placeholder="Site Search">
+<input type="submit" value="&#x2315;">
+</form>
+
+</nav><!-- sidebar -->
+<main id="content">
+
+<p>Hello, and welcome to Scanme.Nmap.Org, a service provided by the <a href="https://nmap.org">Nmap Security Scanner Project</a>.
+
+<p>We set up this machine to help folks learn about Nmap and also to test and make sure that their Nmap installation (or Internet connection) is working properly.  You are authorized to scan this machine with Nmap or other port scanners.  Try not to hammer on the server too hard.  A few scans in a day is fine, but don't scan 100 times a day or use this site to test your ssh brute-force password cracking tool.
+
+<p>Thanks<br>
+-<a href="https://insecure.org/fyodor">Fyodor</a>
+</main><!-- content -->
+
+<footer id="footer" class="purple">
+<ul id="footer-map">
+ <li><a href="https://nmap.org">Nmap</a>
+ <li><a href="https://npcap.com">Npcap</a>
+ <li><a href="https://sectools.org">Sec Tools</a>
+ <li><a href="https://seclists.org/">Mailing Lists</a>
+ <li><a href="https://insecure.org/">Site News</a>
+ <li><a href="https://insecure.org/fyodor/">About/Contact</a>
+ <li><a href="https://insecure.org/advertising.html">Advertising</a>
+ <li><a href="https://insecure.org/privacy.html">Privacy</a>
+</ul>
+<form id="footer-search" action="/search/">
+ <input name="q" type="text" placeholder="Site Search">
+ <input type="submit" value="&#x2315;">
+</form>
+</footer>
+
+</div><!-- grid -->
+</div><!-- wrapper -->
+</body>
+</html>

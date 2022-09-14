@@ -1,8 +1,6 @@
 #! python3
+
 '''
-Version: 1.2
-Developed Platform: Ubuntu Linux 20.04(Ubuntu 20.04.4 LTS)
-Operation Platform: Debian Linux instances
 Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a provided URL for "actionable items"(URLs, redirects, resource references, etc).  
 '''
 
@@ -20,19 +18,15 @@ import string
 import sys
 #*IMPORT BLOCK END*
 
-#*LAMBDA BLOCK BEGIN*
-#**INCOMPLETE BLOCK BEGIN**
-#**INCOMPLETE BLOCK END**
-
-#*LAMBDA BLOCK END*
-
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
 #***FUTURE VERSION BLOCK BEGIN***
 def userInputParser(providedURL):
 	'''
-	#!STUB(Version 2.0 Feature)
+	#!STUB(Future Feature)
 	Function for attempting to clean up user's input & parsing it properly for future connection/handling.
+	:param providedURL: URL passed to the function to then be returned back to the calling function.  Will be adjusted & implemented in later version
+	:type providedURL: str
 	'''
 	try:
 		return providedURL
@@ -42,19 +36,28 @@ def userInputParser(providedURL):
 #***FUTURE VERSION BLOCK END***
 #**STUB BLOCK END**
 
-def userInputHandler(systemInput):
+def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testMode = False,argValue=" "):
 	'''
 	Function for accepting & parsing user input from the console line.  Will return a default value(defaultURL) if no value is given by the user.
 	:param systemInput: Input Data
 	:type systemInput: str
-	:return: url as str
+	:param defaultURL: URL provided to the function to indicate the URL that is to be returned if no value is supplied by the user during initialization of the program
+	:type defaultURL: str
+	:param testMode: Testing value; value to inform the function whether it is operating in a function testing scenario or not.  Default is set to "False" to help assure that the function operates with the assumption of a live environment unless instructed otherwise. 
+	:type testMode: boolean
+	:param argValue: Testing value; value to be provided when testing the function that provides a value in place of "sys.argv[1]" which will not be supplied when running unit tests from test_pubcrawl.py
+	:type argValue: str
+	:return: str
 	'''
-	defaultURL = "https://www.instagram.com/"
 	try:
 		if(len(systemInput) <= 1):
 			cleanedURL = defaultURL
 		else:
-			providedURL = sys.argv[1]
+			if testMode == False:
+				argValue = sys.argv[1]
+			else:
+				argValue = argValue
+			providedURL = argValue
 			cleanedURL = userInputParser(providedURL)
 		return(cleanedURL)
 	except Exception as e:
@@ -69,15 +72,19 @@ class pubCrawl:
 	#**FUTURE VERSION BLOCK BEGIN***
 	def recursiveDepthManager(self,intDepth = 1):
 		'''
-		#!STUB(Version 2.0 Feature)
+		#!STUB(Future Feature)
 		Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
+		:param intDepth: value that defines how far down the program should look for URLs within the URLs that it does find. Will be adjusted & implemented in later version.
+		:type intDepth: int
 		'''
 		if(intDepth == 1):
+			pass
+		else:
 			pass
 
 	def siteRepCheck(self):
 		'''
-		#!STUB(Version 3.0 Feature)
+		#!STUB(Future Feature)
 		Function for integrating API calls on malicious site checkers(Brightcloud, Virustotal, etc) to automatically check provided URLs for malicious activity/poor community reputation.
 		'''
 		pass
@@ -91,11 +98,16 @@ class pubCrawl:
 	#Lambda designed to provide ease of operating system filepath construction.  Expected output: str
 	pathCombiner = lambda self, firstFileValue, secondFileValue : os.path.join(firstFileValue, secondFileValue)
 
-	def __init__(self, inputURL):
+	def __init__(self, inputURL,testMode = False):
 		'''
 		Function for initializing the pubCrawl class when it is called.
+		:param inputURL: URL submitted for scraping by the program
+		:type inputURL: str
+		:param testMode: value to inform the class if it is operating under testing conditions or not
+		:type testMode: boolean
 		'''
 		self.inputURL = inputURL
+		self.testMode = testMode
 
 	def scrapeDynamicSite(self,inputURL):
 		'''
@@ -108,7 +120,8 @@ class pubCrawl:
 			dynamicURLList = self.dynamicSiteGrabber(self.dynamicConnectorFirefox(),inputURL)
 			return(dynamicURLList)
 		except Exception as e:
-			self.logHandler(e, 'scrapeDynamicSite', 'ERROR')
+			logHandlerReturn = self.logHandler(e, 'scrapeDynamicSite', 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
 	def scrapeStaticSite(self,inputURL):
 		'''
@@ -123,9 +136,10 @@ class pubCrawl:
 			staticURLList = self.staticSiteScraper(siteHTML)
 			return staticURLList
 		except Exception as e:
-			self.logHandler(e, 'scrapeStaticSite', 'ERROR')
+			logHandlerReturn = self.logHandler(e, "scrapeStaticSite", 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
-	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION'):
+	def logHandler(self, loggingData, functionSource, logType = 'INFORMATION',writeLocation1 = "output",writeLocation2 = "logs"):
 		'''
 		Function for gathering error information & recording it to a central location.
 		:param loggingData: Exception data provided by the calling function that is to be recorded.
@@ -134,20 +148,30 @@ class pubCrawl:
 		:type functionSource: str
 		:param logType: Exception type provided by calling function to be recorded.
 		:type logType: str
+		:param writeLocation1: String indicating the parent folder of where logHandler() should write its log results
+		:type writeLocation1: str
+		:param writeLocation2: String indicating the child folder of where logHandler() should write its log results
+		:type writeLocation2: str
 		'''
-		loggingData = str(loggingData)
-		functionSource = str(functionSource)
-		logType = str(logType)
-		logTime = datetime.datetime.now()
-		logTime = str(logTime)
-		fileName = logType + '_LOGS' + '.txt'
-		logFilePath = self.pathCombiner("output","logs")
-		fullFilePath = self.pathCombiner(logFilePath,fileName)
-		openMode = 'a+'
-		with open(fullFilePath, openMode) as writeFile:
-			writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
-		print(f"During runtime {functionSource} met a logable event type {logType}")
-		sys.exit(f"Log written to: {fullFilePath}\npubCrawl.py Exiting.")
+		testMode = self.testMode
+		if testMode == False:
+			loggingData = str(loggingData)
+			functionSource = str(functionSource)
+			logType = str(logType)
+			logTime = datetime.datetime.now()
+			logTime = str(logTime)
+			fileName = logType + '_LOGS' + '.txt'
+			logFilePath = self.pathCombiner(writeLocation1,writeLocation2)
+			fullFilePath = self.pathCombiner(logFilePath,fileName)
+			openMode = 'a+'
+			with open(fullFilePath, openMode) as writeFile:
+				writeFile.write(logTime +  " (" + functionSource + "): " + loggingData + ";\n")
+			if logType != "TESTING":
+				print(f"During runtime {functionSource} met a logable event type {logType}")
+				print(f"Log written to: {fullFilePath}")
+			return None
+		else:
+			return loggingData
 
 	def fileNamer(self):
 		'''
@@ -172,7 +196,8 @@ class pubCrawl:
 			fileName = adjectiveSelection + nounSelection + randomDigits
 			return(fileName)
 		except Exception as e:
-			self.logHandler(e, 'filleNamer', 'ERROR')
+			logHandlerReturn = self.logHandler(e, "fileNamer", 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
 	def fileReader(self, fullFileName):
 		'''
@@ -186,28 +211,35 @@ class pubCrawl:
 				data = file.read()
 			return data
 		except Exception as e:
-			self.logHandler(e, 'fileReader', 'ERROR')
+			logHandlerReturn = self.logHandler(e, 'fileReader', 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
-	def dataParser(self, targetSite, providedData, providedFileName, fileType = ".txt"):
+	def dataParser(self, targetSite, providedData, providedFileName, parentFolder = "output", fileType = ".txt"):
 		'''
 		Function for parsing the data that is found from the staticSiteScraper & saving it to a data file.
+		:param targetSite: Value to indicate what site is being scraped for URLs.
+		:type targetSite: str
 		:param providedData: Data provided by calling function that will be written to the file
 		:type providedData: str
 		:param providedFileName: File name that is provided by calling function that the data will be written to.
 		:type providedFileName: str
+		:param parentFolder: Value that indicates what folder data should be written to.
+		:type parentFolder: str
 		:param fileType: the filetype of the file that the data will be written to.
 		:type fileType: str
 		'''
 		mode = 'w'
 		try:
 			fileName = providedFileName + fileType
-			fullFilePath = self.pathCombiner("output",fileName)
+			fullFilePath = self.pathCombiner(parentFolder,fileName)
 			with open(fullFilePath, mode) as fileWriter:
 				fileWriter.write(f'URL Scraped: {targetSite}\n')
 				for link in providedData:
 					fileWriter.write(f'{link}\n')
 		except Exception as e:
-			self.logHandler(e, 'dataParser', 'ERROR')
+			logHandlerReturn = self.logHandler(e, 'dataParser', 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
+			return(testResolve)
 
 	def staticSiteScraper(self, providedHTML):
 		'''
@@ -224,7 +256,7 @@ class pubCrawl:
 			return(urlList)
 		except Exception as e:
 			self.logHandler(e, 'staticSiteScraper', 'ERROR')
-
+	
 	def siteConnector(self, workingURL):
 		'''
 		Function for negotiating & connecting to user supplied URL.
@@ -236,11 +268,12 @@ class pubCrawl:
 			response = requests.get(workingURL)
 			return(response.text)
 		except Exception as e:
-			self.logHandler(e, 'siteConnector', 'ERROR')
+			logHandlerReturn = self.logHandler(e, "siteConnector", 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
 	def dynamicConnectorFirefox(self):
 		'''
-	Function for creating a Selenium web browser driver in Firefox
+		Function for creating a Selenium web browser driver in Firefox
 		:return: selenium.webdriver.firefox.webdriver.WebDriver
 		'''
 		try:
@@ -249,7 +282,8 @@ class pubCrawl:
 			driver = webdriver.Firefox(options=options)
 			return driver
 		except Exception as e:
-			self.logHandler(e, 'dynamicConnectorFirefox', 'ERROR')
+			logHandlerReturn = self.logHandler(e, 'dynamicConnectorFirefox', 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
 
 	def dynamicSiteGrabber(self,providedDriver,providedURL,searchingElement1 = 'tag name',searchingElement2 = 'a',retrievingAttribute = 'href'):
 		'''
@@ -275,11 +309,28 @@ class pubCrawl:
 				foundURLs.append(elem.get_attribute(retrievingAttribute))
 			return foundURLs
 		except Exception as e:
-			self.logHandler(e, 'dynamicSiteGrabber', 'ERROR')
+			logHandlerReturn = self.logHandler(e, 'dynamicSiteGrabber', 'ERROR')
+			testResolve = self.testHandler(logHandlerReturn,e)
+
+	def testHandler(self,logHandlerValue,exceptionValue):
+		'''
+		Function for assisting the class to determine what steps to complete based on the values it recieves
+		:param logHandlerValue: Value that may be passed to the fuction that was supplied by logHandler() if the class is running in testMode
+		:type logHandlerValue: str
+		:param exceptionValue: Value that is supplied to the function & returned if it is determined that the logHandlerValue contains nothing(None)
+		:type exceptionValue: TypeError
+		:return: TypeError
+		'''
+		if logHandlerValue == None:
+			sys.exit("Exiting")
+		else:
+			return exceptionValue
 
 	def scrapeSite(self,targetType='HYBRIDSITE'):
 		'''
 		Function for activating & operating the pubCrawl class in the anticipated order & manner if the user is planning on performing both static & dynamic scraping.
+		:param targetType: Value that indicates the type of site that is going to be scraped.  DYNAMICSITE indicates a site that should be scraped for only URLs that arrive after scripts are allowed to load.  STATICSITE indicates a site that should only be scraped for URLS before scripts are allowed to load.  HYBRIDSITE indicates a site that should be scraped for URLS both before & after scripts are allowed to load.
+		:type targetType: str
 		'''
 		workingURL = self.inputURL
 		targetType = targetType.upper()
