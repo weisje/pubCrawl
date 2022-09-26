@@ -28,12 +28,19 @@ def userInputParser(providedURL):
 	:param providedURL: URL passed to the function to then be returned back to the calling function.  Will be adjusted & implemented in later version
 	:type providedURL: str
 	'''
+
+	print(f"userInputParser's providedURL: {providedURL}")
 	try:
 		return providedURL
 	except Exception as e:
 		logHandler(e, 'userInputParser', 'ERROR')
 
 #***FUTURE VERSION BLOCK END***
+def schemeIterator():
+	'''
+	function for attempting to regulate & massage user inputted URLs for better functionality, primarily while working with the requests library.  	
+	'''
+
 #**STUB BLOCK END**
 
 def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testMode = False,argValue=" "):
