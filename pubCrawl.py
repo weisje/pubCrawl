@@ -8,6 +8,7 @@ Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a p
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as firefoxOptions
+from urllib.parse import urlparse
 import datetime
 import json
 import os.path
@@ -21,17 +22,35 @@ import sys
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
 #***FUTURE VERSION BLOCK BEGIN***
-def userInputParser(providedURL):
+def userInputParser(providedURL, schemeOptions = ['https','http']):
 	'''
 	#!STUB(Future Feature)
 	Function for attempting to clean up user's input & parsing it properly for future connection/handling.
 	:param providedURL: URL passed to the function to then be returned back to the calling function.  Will be adjusted & implemented in later version
 	:type providedURL: str
+	:param schemeOptions: list of options to be iterated through to be applied to the providedURL if no schemes have already been applied to providedURL when it was submitted.
+	:type schemeOptions: list of strings
 	'''
 
 	print(f"userInputParser's providedURL: {providedURL}")
 	try:
-		return providedURL
+		parsedURL = urlparse(providedURL)
+		if parsedURL[1] != '':	#Check to determine if the value in parsedURL's netloc(parsedURL[1]) is populated.
+			checkedURL = f"{parsedURL[0]}://{parsedURL[1]}/" #Line that reconstructs the provided URL to include only the URL's scheme(parsedURL[0]) & it's netloc(parsedURL[1]) in form "{SCHEME}://{NETLOC}/"("{http}://{scanme.nmap.org}/" excluding curley braces)
+		
+		else:
+			for scheme in schemeOptions:
+				urlToCheck = f"{scheme}://{parsedURL[2]}" #Line that reconstructs the value in providedURL's path to add the current tested scheme to form "{SCHEME}://{PATH}"({http}://{scanme.nmap.org}" excluding curley braces)
+				try: #Block to test the relative provided URL with the applied scheme
+					print(f"testing {urlToCheck}")
+					request = requests.get(urlToCheck)
+					checkedURL = urlToCheck
+					break
+				except:
+					continue
+
+		return checkedURL
+
 	except Exception as e:
 		logHandler(e, 'userInputParser', 'ERROR')
 
