@@ -22,44 +22,72 @@ import sys
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
 #***FUTURE VERSION BLOCK BEGIN***
-def userInputParser(providedURL, schemeOptions = ['https','http']):
+def userInputParser(providedURL):
 	'''
 	#!STUB(Future Feature)
 	Function for attempting to clean up user's input & parsing it properly for future connection/handling.
-	:param providedURL: URL passed to the function to then be returned back to the calling function.  Will be adjusted & implemented in later version
+	:param providedURL: URL passed to the function to be evaluated & parsed to assure that the working URL is constructed in a predictable, more absolute way
 	:type providedURL: str
-	:param schemeOptions: list of options to be iterated through to be applied to the providedURL if no schemes have already been applied to providedURL when it was submitted.
-	:type schemeOptions: list of strings
+	:return: str
 	'''
 
 	print(f"userInputParser's providedURL: {providedURL}")
 	try:
 		parsedURL = urlparse(providedURL)
 		if parsedURL[1] != '':	#Check to determine if the value in parsedURL's netloc(parsedURL[1]) is populated.
-			checkedURL = f"{parsedURL[0]}://{parsedURL[1]}/" #Line that reconstructs the provided URL to include only the URL's scheme(parsedURL[0]) & it's netloc(parsedURL[1]) in form "{SCHEME}://{NETLOC}/"("{http}://{scanme.nmap.org}/" excluding curley braces)
-		
+			checkedURL = urlNetLocCreator(parsedURL)
 		else:
-			for scheme in schemeOptions:
-				urlToCheck = f"{scheme}://{parsedURL[2]}" #Line that reconstructs the value in providedURL's path to add the current tested scheme to form "{SCHEME}://{PATH}"({http}://{scanme.nmap.org}" excluding curley braces)
-				try: #Block to test the relative provided URL with the applied scheme
-					print(f"testing {urlToCheck}")
-					request = requests.get(urlToCheck)
-					checkedURL = urlToCheck
-					break
-				except:
-					continue
+			checkedURL = schemeIterator(parsedURL)
 
 		return checkedURL
 
 	except Exception as e:
-		logHandler(e, 'userInputParser', 'ERROR')
+		pubCrawl.logHandler(e, 'userInputParser', 'ERROR')
 
 #***FUTURE VERSION BLOCK END***
-def schemeIterator():
+def schemeIterator(providedRelativeURL, schemeOptions = ['https','http']):
 	'''
-	function for attempting to regulate & massage user inputted URLs for better functionality, primarily while working with the requests library.  	
+	!STUB(Incomplete Function)
+	Function for attempting to regulate & massage user inputted URLs for better functionality, primarily while working with the requests library.  	
+	:param providedRelativeURL: Value to define the URL that will have different schemes applied to it to assure that it will lead to a functional URL.
+	:type providedRelativeURL: str
+	:param schemeOptions: list of options to be iterated through to be applied to the providedRelativeURL if no schemes have already been applied to providedRelativeURL when it was submitted.
+	:type schemeOptions: list of strings that define URL schemes to be tested. This will be in order to assure that the URL provided will resolve properly.
+	:return str:
 	'''
 
+	try:
+		for scheme in schemeOptions:
+			urlToCheck = f"{scheme}://{providedRelativeURL[2]}/" #Line that reconstructs the value in providedURL's path to add the current tested scheme to form "{SCHEME}://{PATH}"({http}://{scanme.nmap.org}" excluding curley braces)
+			try: #Block to test the relative provided URL with the applied scheme
+				print(f"testing {urlToCheck}")
+				request = requests.get(urlToCheck)
+				checkedURL = urlToCheck
+				break
+			except:
+				continue
+		
+		return checkedURL
+
+	except Exception as e:
+		pubCrawl.logHandler(e, 'schemeIterator', 'ERROR')
+
+def urlNetLocCreator(providedURL):
+	'''
+	!STUB(Incomplete Function)
+	Function for taking strings provided by calling function, evaluating, & processing it so that netlocations(netloc) can be seperated more easily from paths(path).
+	:param providedURL: Value to define the URL that will be evaluated & rebuilt so it more cleanly provides an absolute URL instead of a relative URL.
+	:type providedURL: str
+	:return: str
+	'''
+
+	try:
+		checkedURL = f"{providedURL[0]}://{providedURL[1]}/" #Line that reconstructs the provided URL to include only the URL's scheme(parsedURL[0]) & it's netloc(parsedURL[1]) in form "{SCHEME}://{NETLOC}/"("{http}://{scanme.nmap.org}/" excluding curley braces)
+		return checkedURL
+
+	except Exception as e:
+		pubCrawl.logHandler(e, 'urlNetLocCreator', 'ERROR')
+	
 #**STUB BLOCK END**
 
 def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testMode = False,argValue=" "):
