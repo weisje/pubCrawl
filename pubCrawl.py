@@ -8,6 +8,7 @@ Overview: pubCrawl.py is a python script designed to "scrape" the webpage of a p
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as firefoxOptions
+from urllib.parse import urlparse
 import datetime
 import json
 import os.path
@@ -21,26 +22,9 @@ import sys
 #*FUNCTION BLOCK BEGIN*
 #**STUB BLOCK BEGIN**
 #***FUTURE VERSION BLOCK BEGIN***
-def userInputParser(providedURL):
-	'''
-	#!STUB(Future Feature)
-	Function for attempting to clean up user's input & parsing it properly for future connection/handling.
-	:param providedURL: URL passed to the function to then be returned back to the calling function.  Will be adjusted & implemented in later version
-	:type providedURL: str
-	'''
-
-	print(f"userInputParser's providedURL: {providedURL}")
-	try:
-		return providedURL
-	except Exception as e:
-		logHandler(e, 'userInputParser', 'ERROR')
 
 #***FUTURE VERSION BLOCK END***
-def schemeIterator():
-	'''
-	function for attempting to regulate & massage user inputted URLs for better functionality, primarily while working with the requests library.  	
-	'''
-
+	
 #**STUB BLOCK END**
 
 def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testMode = False,argValue=" "):
@@ -56,6 +40,7 @@ def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testM
 	:type argValue: str
 	:return: str
 	'''
+	
 	try:
 		if(len(systemInput) <= 1):
 			cleanedURL = defaultURL
@@ -65,7 +50,8 @@ def userInputHandler(systemInput,defaultURL = "https://www.instagram.com/",testM
 			else:
 				argValue = argValue
 			providedURL = argValue
-			cleanedURL = userInputParser(providedURL)
+			urlCleaner = pubCrawl(providedURL)
+			cleanedURL = urlCleaner.userInputParser(providedURL)
 		return(cleanedURL)
 	except Exception as e:
 		logger = pubCrawl(systemInput)
@@ -105,7 +91,7 @@ class pubCrawl:
 	#Lambda designed to provide ease of operating system filepath construction.  Expected output: str
 	pathCombiner = lambda self, firstFileValue, secondFileValue : os.path.join(firstFileValue, secondFileValue)
 
-	def __init__(self, inputURL,testMode = False):
+	def __init__(self, inputURL,scanDepth = 0, testMode = False):
 		'''
 		Function for initializing the pubCrawl class when it is called.
 		:param inputURL: URL submitted for scraping by the program
@@ -114,7 +100,69 @@ class pubCrawl:
 		:type testMode: boolean
 		'''
 		self.inputURL = inputURL
+		self.scanDepth = scanDepth
 		self.testMode = testMode
+
+	def userInputParser(self,providedURL):
+		'''
+		Function for attempting to clean up user's input & parsing it properly for future connection/handling.
+		:param providedURL: URL passed to the function to be evaluated & parsed to assure that the working URL is constructed in a predictable, more absolute way
+		:type providedURL: str
+		:return: str
+		'''
+
+		print(f"userInputParser's providedURL: {providedURL}")
+		try:
+			parsedURL = urlparse(providedURL)
+			if parsedURL[1] != '':	#Check to determine if the value in parsedURL's netloc(parsedURL[1]) is populated.
+				checkedURL = self.urlNetLocCreator(parsedURL)
+			else:
+				checkedURL = self.schemeIterator(parsedURL)
+
+			return checkedURL
+
+		except Exception as e:
+			self.logHandler(e, 'userInputParser', 'ERROR')
+
+	def schemeIterator(self,providedRelativeURL, schemeOptions = ['https','http']):
+		'''
+		Function for attempting to regulate & massage user inputted URLs for better functionality, primarily while working with the requests library.  	
+		:param providedRelativeURL: Value to define the URL that will have different schemes applied to it to assure that it will lead to a functional URL.
+		:type providedRelativeURL: str
+		:param schemeOptions: list of options to be iterated through to be applied to the providedRelativeURL if no schemes have already been applied to providedRelativeURL when it was submitted.
+		:type schemeOptions: list of strings that define URL schemes to be tested. This will be in order to assure that the URL provided will resolve properly.
+		:return str:
+		'''
+
+		try:
+			for scheme in schemeOptions:
+				urlToCheck = f"{scheme}://{providedRelativeURL[2]}/" #Line that reconstructs the value in providedURL's path to add the current tested scheme to form "{SCHEME}://{PATH}"({http}://{scanme.nmap.org}" excluding curley braces)
+				try: #Block to test the relative provided URL with the applied scheme
+					request = requests.get(urlToCheck)
+					checkedURL = urlToCheck
+					break
+				except:
+					continue
+			
+			return checkedURL
+
+		except Exception as e:
+			self.logHandler(e, 'schemeIterator', 'ERROR')
+
+	def urlNetLocCreator(self, providedURL):
+		'''
+		Function for taking strings provided by calling function, evaluating, & processing it so that netlocations(netloc) can be seperated more easily from paths(path).
+		:param providedURL: Value to define the URL that will be evaluated & rebuilt so it more cleanly provides an absolute URL instead of a relative URL.
+		:type providedURL: str
+		:return: str
+		'''
+
+		try:
+			checkedURL = f"{providedURL[0]}://{providedURL[1]}/" #Line that reconstructs the provided URL to include only the URL's scheme(parsedURL[0]) & it's netloc(parsedURL[1]) in form "{SCHEME}://{NETLOC}/"("{http}://{scanme.nmap.org}/" excluding curley braces)
+			return checkedURL
+
+		except Exception as e:
+			self.logHandler(e, 'urlNetLocCreator', 'ERROR')
 
 	def scrapeDynamicSite(self,inputURL):
 		'''
@@ -342,6 +390,7 @@ class pubCrawl:
 		workingURL = self.inputURL
 		targetType = targetType.upper()
 		print(f"URL to be scraped: {workingURL}")
+		print(f"Depth Set: {str(self.scanDepth)}")
 		if(targetType == 'HYBRIDSITE'):
 			staticURLList = self.scrapeStaticSite(workingURL)
 			dynamicURLList = self.scrapeDynamicSite(workingURL)
@@ -365,7 +414,7 @@ def main():
 	'''
 
 	workingURL = userInputHandler(sys.argv)
-	pub_crawl = pubCrawl(workingURL)
+	pub_crawl = pubCrawl(workingURL,2)
 	pub_crawl.scrapeSite()
 
 #*FUNCTION BLOCK END*
