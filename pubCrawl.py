@@ -389,24 +389,33 @@ class pubCrawl:
 		'''
 		workingURL = self.inputURL
 		targetType = targetType.upper()
+		depthCounter = 0
+		urlList = []
+		while(depthCounter <= self.scanDepth):
+			print(depthCounter)
+			depthCounter += 1
 		print(f"URL to be scraped: {workingURL}")
 		print(f"Depth Set: {str(self.scanDepth)}")
 		if(targetType == 'HYBRIDSITE'):
 			staticURLList = self.scrapeStaticSite(workingURL)
 			dynamicURLList = self.scrapeDynamicSite(workingURL)
-			uniqueURLList = set.union(set(staticURLList),set(dynamicURLList))
+			uniqueURLSet = set.union(set(staticURLList),set(dynamicURLList))
 		elif(targetType == 'DYNAMICSITE'):
 			uniqueURLList = self.scrapeDynamicSite(workingURL)
-			uniqueURLList = set(uniqueURLList)
+			uniqueURLSet = set(uniqueURLList)
 		elif(targetType == 'STATICSITE'):
 			uniqueURLList = self.scrapeStaticSite(workingURL)
-			uniqueURLList = set(uniqueURLList)
+			uniqueURLSet = set(uniqueURLList)
 		else:
 			sys.exit(f'{targetType} is not a valid targetType value. Try again with one of the following:\n\n\tHYBRIDSITE\n\tDYNAMICSITE\n\tSTATICSITE\n')
 
+		for url in uniqueURLSet:
+			urlList.append(url)
+			
 		fileName = self.fileNamer()
-		self.dataParser(workingURL,uniqueURLList, fileName)
+		self.dataParser(workingURL,uniqueURLSet, fileName)
 		print(f"Results stored to {fileName}")
+		print(urlList)
 
 def main():
 	'''
@@ -414,7 +423,7 @@ def main():
 	'''
 
 	workingURL = userInputHandler(sys.argv)
-	pub_crawl = pubCrawl(workingURL,2)
+	pub_crawl = pubCrawl(workingURL)
 	pub_crawl.scrapeSite()
 
 #*FUNCTION BLOCK END*
