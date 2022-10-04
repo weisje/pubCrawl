@@ -121,18 +121,16 @@ class pubCrawl:
 
 				for url in scanningList:
 					if url in masterList:
-						print(f"Existing URL: {url}")
 						continue
 					else:
-						print(f"New URL: {url}")
 						urlList = self.scrapeSite(url,targetType)
 						for url in urlList:
 							if url in resultList:
-								print(f"Existing URL: {url}")
 								continue
 							else:
 								resultList.append(url)
-						print(resultList)
+						print(f"resultsList Length: {len(resultList)}")
+						print(f"masterList Length: {len(masterList)}")
 
 				#for url in urlList:
 					#resultList.append(url)
