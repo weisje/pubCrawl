@@ -63,17 +63,6 @@ class pubCrawl:
 	'''
 	#*STUB BLOCK BEGIN**
 	#**FUTURE VERSION BLOCK BEGIN***
-	def recursiveDepthManager(self,intDepth = 1):
-		'''
-		#!STUB(Future Feature)
-		Function for managing & orchestrating the recursive function of user defined depths of scraping on found resources.
-		:param intDepth: value that defines how far down the program should look for URLs within the URLs that it does find. Will be adjusted & implemented in later version.
-		:type intDepth: int
-		'''
-		if(intDepth == 1):
-			pass
-		else:
-			pass
 
 	def siteRepCheck(self):
 		'''
@@ -102,6 +91,56 @@ class pubCrawl:
 		self.inputURL = inputURL
 		self.scanDepth = scanDepth
 		self.testMode = testMode
+
+	def depthScanManager(self,workingURL, scanDepth = 1, targetType = 'HYBRIDSITE'):
+		'''
+		#!STUB(Future Feature)
+		Function for managing & orchestrating the depth that URLs will be scanned for further URLs user defined depths of scraping on found resources.
+		:param workingURL: Intial URL that is to be scrapped by pubCrawl.
+		:type workingURL: str
+		:param targetType: Value that indicates the type of site that is going to be scraped.  DYNAMICSITE indicates a site that should be scraped for only URLs that arrive after scripts are allowed to load.  STATICSITE indicates a site that should only be scraped for URLS before scripts are allowed to load.  HYBRIDSITE indicates a site that should be scraped for URLS both before & after scripts are allowed to load.
+		:type targetType: str
+		:param intDepth: value that defines how far down the program should look for URLs within the URLs that it does find. Will be adjusted & implemented in later version.
+		:type intDepth: int
+		:return: list of URLs
+		'''
+
+		masterList = []
+		scanningList = []
+		resultList = []
+		try:
+			for depth in range(scanDepth):
+				if depth == 0:
+					#urlList = self.scrapeSite(workingURL,targetType)
+					scanningList.append(workingURL)
+				else:
+					scanningList = []
+					for url in resultList:
+						scanningList.append(url)
+					resultList = []
+
+				for url in scanningList:
+					if url in masterList:
+						print(f"Existing URL: {url}")
+						continue
+					else:
+						print(f"New URL: {url}")
+						urlList = self.scrapeSite(url,targetType)
+						for url in urlList:
+							if url in resultList:
+								print(f"Existing URL: {url}")
+								continue
+							else:
+								resultList.append(url)
+						print(resultList)
+
+				#for url in urlList:
+					#resultList.append(url)
+
+			masterList = set.union(set(resultList),set(masterList))
+			return(masterList)
+		except Exception as e:
+			self.logHandler(e, 'depthScanManager', 'ERROR')
 
 	def userInputParser(self,providedURL):
 		'''
@@ -362,7 +401,9 @@ class pubCrawl:
 			allLinks = driver.find_elements(searchingElement1,searchingElement2)
 			for elem in allLinks:
 				foundURLs.append(elem.get_attribute(retrievingAttribute))
+			driver.close()
 			return foundURLs
+
 		except Exception as e:
 			logHandlerReturn = self.logHandler(e, 'dynamicSiteGrabber', 'ERROR')
 			testResolve = self.testHandler(logHandlerReturn,e)
@@ -381,21 +422,19 @@ class pubCrawl:
 		else:
 			return exceptionValue
 
-	def scrapeSite(self,targetType='HYBRIDSITE'):
+	def scrapeSite(self, workingURL, targetType='HYBRIDSITE'):
 		'''
 		Function for activating & operating the pubCrawl class in the anticipated order & manner if the user is planning on performing both static & dynamic scraping.
+		:param workingURL: URL that will be scraped for more URLs
+		:type workingURL: str
 		:param targetType: Value that indicates the type of site that is going to be scraped.  DYNAMICSITE indicates a site that should be scraped for only URLs that arrive after scripts are allowed to load.  STATICSITE indicates a site that should only be scraped for URLS before scripts are allowed to load.  HYBRIDSITE indicates a site that should be scraped for URLS both before & after scripts are allowed to load.
 		:type targetType: str
+		:return: List of URLs
 		'''
-		workingURL = self.inputURL
+
 		targetType = targetType.upper()
-		depthCounter = 0
 		urlList = []
-		while(depthCounter <= self.scanDepth):
-			print(depthCounter)
-			depthCounter += 1
 		print(f"URL to be scraped: {workingURL}")
-		print(f"Depth Set: {str(self.scanDepth)}")
 		if(targetType == 'HYBRIDSITE'):
 			staticURLList = self.scrapeStaticSite(workingURL)
 			dynamicURLList = self.scrapeDynamicSite(workingURL)
@@ -411,11 +450,30 @@ class pubCrawl:
 
 		for url in uniqueURLSet:
 			urlList.append(url)
-			
-		fileName = self.fileNamer()
-		self.dataParser(workingURL,uniqueURLSet, fileName)
-		print(f"Results stored to {fileName}")
+
+		return(urlList)
+
+
+	def scrapingController(self,targetType = 'HYBRIDSITE',scrapeDepth = 1):
+		'''
+		!(STUB: Work in Progress) 
+		Function for dictating how & when a URL should be scraped.  Acts as a contril function for the pubCrawl class.
+		:param targetType: Value that indicates the type of site that is going to be scraped.  DYNAMICSITE indicates a site that should be scraped for only URLs that arrive after scripts are allowed to load.  STATICSITE indicates a site that should only be scraped for URLS before scripts are allowed to load.  HYBRIDSITE indicates a site that should be scraped for URLS both before & after scripts are allowed to load.
+		:type targetType: str
+		:param scrapeDepth: Variable that dictates how many times the URLs should be iterated through.  Default value is 1 to represent that at the very least the inputURL should be scraped
+		:type scrapeDepth: int
+
+		'''
+		workingURL = self.inputURL
+		#urlList = self.scrapeSite(workingURL,targetType)
+		urlList = self.depthScanManager(workingURL, 2)
+		print(type(urlList))
 		print(urlList)
+
+		fileName = self.fileNamer()
+		self.dataParser(workingURL,urlList, fileName)
+		print(f"Results stored to {fileName}")
+
 
 def main():
 	'''
@@ -424,7 +482,7 @@ def main():
 
 	workingURL = userInputHandler(sys.argv)
 	pub_crawl = pubCrawl(workingURL)
-	pub_crawl.scrapeSite()
+	pub_crawl.scrapingController()
 
 #*FUNCTION BLOCK END*
 
