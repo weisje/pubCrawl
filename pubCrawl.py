@@ -17,6 +17,7 @@ import requests
 import re
 import string
 import sys
+import tld
 #*IMPORT BLOCK END*
 
 #*FUNCTION BLOCK BEGIN*
@@ -108,19 +109,25 @@ class pubCrawl:
 		masterList = []
 		scanningList = []
 		resultList = []
+		workingDomain = tld.get_fld(workingURL)
+		print(f"Working Domain: {workingDomain}")
 		try:
 			for depth in range(scanDepth):
 				if depth == 0:
-					#urlList = self.scrapeSite(workingURL,targetType)
 					scanningList.append(workingURL)
 				else:
 					scanningList = []
 					for url in resultList:
-						scanningList.append(url)
+						if(tld.get_fld(url) == workingDomain):
+							scanningList.append(url)
+						else:
+							print(f"{url} does not match domain of {workingDomain}")
 					resultList = []
 
 				for url in scanningList:
-					if url in masterList:
+					if url is None:
+						continue
+					elif url in masterList:
 						continue
 					else:
 						urlList = self.scrapeSite(url,targetType)
@@ -131,9 +138,6 @@ class pubCrawl:
 								resultList.append(url)
 						print(f"resultsList Length: {len(resultList)}")
 						print(f"masterList Length: {len(masterList)}")
-
-				#for url in urlList:
-					#resultList.append(url)
 
 			masterList = set.union(set(resultList),set(masterList))
 			return(masterList)
